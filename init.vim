@@ -1,3 +1,13 @@
+"##########"
+" vim-plug "
+"##########"
+
+call plug#begin()
+Plug 'vim-scripts/tcomment'
+call plug#end()
+
+
+
 "###########"
 " Shortcuts "
 "###########"
@@ -63,5 +73,17 @@ cnoremap <C-A>        <Home>
 cnoremap <C-E>        <End>
 cnoremap <C-K>        <C-U>
 
+" Disable automatic insertion of comments (includes workaround setting for bug #4684):
+filetype plugin indent on
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
+
 " TODO: Autoinsert close brace. Should handle JS and Rust cases. Python
 " different
+
+"#########"
+" Plugins "
+"#########"
+
+" tComment:
+map <leader>cc :TComment<CR>

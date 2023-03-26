@@ -1,0 +1,4 @@
+# Dependencies:
+  - prettier
+  - fzf
+  - ripgrep
