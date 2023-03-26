@@ -3,6 +3,11 @@
 "##########"
 
 call plug#begin()
+Plug 'frazrepo/vim-rainbow'
+Plug 'junegunn/fzf', { 'do': './install --all' } | Plug 'junegunn/fzf.vim'
+Plug 'junegunn/fzf.vim'
+Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
 Plug 'vim-scripts/tcomment'
 call plug#end()
 
@@ -85,5 +90,21 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 " Plugins "
 "#########"
 
-" tComment:
+" vim-rainbow:
+let g:rainbow_active = 1
+
+" FZF:
+map <leader>t :FZF <CR>
+map <leader>f :Rg 
+
+" NERDTree:
+map \ :NERDTreeToggle<CR>
+let NERDTreeQuitOnOpen = 1
+let NERDTreeIgnore=['\.pyc$']
+
+" vim-airline
+let g:airline_powerline_fonts = 1
+
+" TComment:
 map <leader>cc :TComment<CR>
+
