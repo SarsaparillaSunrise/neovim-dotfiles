@@ -30,7 +30,7 @@ map <right> :bn<CR>
 map <left> :bp<CR>
 
 " End of line:
-nmap ` $
+map ` $
 
 " Unmap F1:
 nmap <F1> :echo<CR>
