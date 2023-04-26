@@ -21,6 +21,7 @@ let g:mapleader = ","
 
 " Fast saving:
 nmap <leader>s :w<CR>
+nmap <cr> :w<cr>
 
 " Close buffer:
 nmap <leader>bd :bd<CR>
