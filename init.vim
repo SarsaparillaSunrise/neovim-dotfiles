@@ -3,6 +3,7 @@
 "##########"
 
 call plug#begin()
+Plug 'elixir-editors/vim-elixir'
 Plug 'frazrepo/vim-rainbow'
 Plug 'junegunn/fzf', { 'do': './install --all' } | Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf.vim'
