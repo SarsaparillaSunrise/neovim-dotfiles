@@ -1,4 +1,6 @@
 {
   "coc.preferences.formatOnSaveFiletypes": ["javascript", "typescript"],
   "suggest.noselect": true,
+  "svelte.enable-ts-plugin": true,
+  "elixir.pathToElixirLS": "/usr/bin/elixir-ls"
 }
