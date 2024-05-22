@@ -1,4 +1,16 @@
 {
+  "languageserver": {
+    "bash": {
+      "command": "~/.config/coc/extensions/node_modules/coc-sh/node_modules/.bin/bash-language-server",
+      "args": ["start"],
+      "filetypes": ["sh"]
+    },
+    "python": {
+      "command": "ruff",
+      "args": ["server", "--preview"],
+      "filetypes": ["python"],
+    }
+  },
   "coc.preferences.formatOnSaveFiletypes": ["javascript", "typescript"],
   "suggest.noselect": true,
   "svelte.enable-ts-plugin": true,
