@@ -1,8 +1,7 @@
 <h1 align="center">Neovim Dotfiles</h1>
 <br>
 
-Installation
-------------
+# Installation
 
 Install dependencies and run:
 
@@ -13,7 +12,8 @@ Install dependencies and run:
     nvim +PlugInstall
 
 
-# Dependencies:
+Dependencies:
+-------------
   - fzf
   - ripgrep
   - [vim-plug](https://github.com/junegunn/vim-plug)
@@ -21,7 +21,8 @@ Install dependencies and run:
   - Ruff
 
 
-# Plugins:
+Plugins:
+--------
   - https://github.com/fannheyward/coc-pyright
   - https://github.com/josa42/coc-sh
   - https://github.com/neoclide/coc-prettier
