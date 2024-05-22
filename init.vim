@@ -51,8 +51,11 @@ nmap <F1> :echo<CR>
 set number
 set linebreak
 
-" Sets colours
-set background=light
+" Set background:
+set background=dark
+
+" Set colour scheme:
+colorscheme solarized8
 
 "###########"
 " Behaviour "
