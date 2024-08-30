@@ -6,7 +6,7 @@
 Install dependencies and run:
 
     mkdir -p ~/.config/nvim
-    git clone https://github.com/sasparillasunrise/neovim-dotfiles.git ~/.config/nvim
+    git clone https://github.com/SarsaparillaSunrise/neovim-dotfiles.git ~/.config/nvim
     sh -c 'curl -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
     nvim +PlugInstall
