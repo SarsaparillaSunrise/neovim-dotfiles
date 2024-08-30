@@ -11,8 +11,19 @@
       "filetypes": ["python"],
     }
   },
-  "coc.preferences.formatOnSaveFiletypes": ["javascript", "typescript"],
+  "coc.preferences.formatOnSaveFiletypes": ["javascript", "typescript", "python", "elixir"],
   "suggest.noselect": true,
   "svelte.enable-ts-plugin": true,
-  "elixir.pathToElixirLS": "/usr/bin/elixir-ls"
+  "elixir.pathToElixirLS": "/usr/bin/elixir-ls",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.indexing": true,
+  "python.analysis.packageIndexDepths": [
+    {
+      "name": "",
+      "depth": 3
+    },
+
+  ],
+  "biome.bin": "/usr/bin/biome",
+  "biome.requireConfiguration": false
 }
