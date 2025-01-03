@@ -72,6 +72,13 @@ require("lazy").setup({
                     ["<C-p>"] = cmp.mapping.select_prev_item(),
                     ["<C-Space>"] = cmp.mapping.complete(),
                     ["<CR>"] = cmp.mapping.confirm({ select = true }),
+                    ["<Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            fallback()  -- The fallback function sends a tab character
+                        end
+                    end, { "i", "s" }),
                 },
                 sources = {
                     { name = "nvim_lsp" },
