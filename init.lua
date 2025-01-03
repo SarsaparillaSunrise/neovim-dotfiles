@@ -15,6 +15,19 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Leader key
+vim.g.mapleader = ' ' -- Space as the leader key
+
+-- Saving
+vim.api.nvim_set_keymap('n', '<Leader>s', ':w<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Enter>', ':w<CR>', { noremap = true, silent = true })
+
+-- Buffers
+vim.api.nvim_set_keymap('n', '<Right>', ':bn<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Left>', ':bp<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>bd', ':bd<CR>', { noremap = true, silent = true })
+
+-- TODO: Emacs bindings for command line:
 
 -- Behavioural settings:
 vim.o.tabstop = 4 -- Number of spaces a tab represents
@@ -24,6 +37,13 @@ vim.o.smartindent = true -- Automatically indent new lines
 vim.o.spr = true -- Ensure vertical splits are on the right hand side
 vim.o.swapfile = false -- Disable swap file
 vim.o.clipboard = "unnamedplus"  -- Use system clipboard
+-- Prevent automatic comment insertion on new line
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "*",
+  callback = function()
+    vim.opt_local.formatoptions:remove({ 'r', 'o' })
+  end,
+})
 
 -- Search settings:
 vim.o.ignorecase = true -- case insensitive
@@ -40,50 +60,6 @@ vim.o.linebreak = true -- Enable line breaks
 -- Syntax highlighting and filetype plugins
 vim.cmd('syntax enable')
 vim.cmd('filetype plugin indent on')
-
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = "*",
---   callback = function()
---     vim.opt_local.formatoptions:remove("c")
---     vim.opt_local.formatoptions:remove("r")
---     vim.opt_local.formatoptions:remove("o")
---   end,
--- })
---
--- vim.api.nvim_create_autocmd("BufReadPost", {
---   pattern = "*",
---   callback = function()
---     local filename = vim.fn.expand("%:p")
---     local last_line = vim.fn.line("'\"")
---     local total_lines = vim.fn.line("$")
---
---     if not filename:match("%.git[\\/\\]COMMIT_EDITMSG$") and last_line > 1 and last_line <= total_lines then
---       vim.cmd("normal! g`\"")
---     end
---   end,
--- })
-
--- Prevent automatic comment insertion on new line
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "*",
-  callback = function()
-    vim.opt_local.formatoptions:remove({ 'r', 'o' })
-  end,
-})
-
--- Leader key
-vim.g.mapleader = ' ' -- Space as the leader key
-
--- Saving
-vim.api.nvim_set_keymap('n', '<Leader>s', ':w<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Enter>', ':w<CR>', { noremap = true, silent = true })
-
--- Buffers
-vim.api.nvim_set_keymap('n', '<Right>', ':bn<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Left>', ':bp<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>bd', ':bd<CR>', { noremap = true, silent = true })
-
--- TODO: Emacs bindings for command line:
 
 -- Setup lazy.nvim
 require("lazy").setup({
