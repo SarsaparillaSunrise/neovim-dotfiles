@@ -21,7 +21,6 @@ vim.o.tabstop = 4 -- Number of spaces a tab represents
 vim.o.shiftwidth = 4 -- Number of spaces for each indentation
 vim.o.expandtab = true -- Convert tabs to spaces
 vim.o.smartindent = true -- Automatically indent new lines
-vim.o.wrap = false -- Disable line wrapping
 vim.o.cursorline = true -- Highlight the current line
 vim.o.termguicolors = true -- Enable 24-bit RGB colors
 
@@ -36,12 +35,19 @@ vim.api.nvim_set_keymap('n', '<Leader>w', ':w<CR>', { noremap = true, silent = t
 -- Setup lazy.nvim
 require("lazy").setup({
     {
-        "windwp/nvim-autopairs",
-        event = "InsertEnter",
-        config = function()
-            require("nvim-autopairs").setup({})
-        end,
+      'maxmx03/solarized.nvim',
+      lazy = false,
+      priority = 1000,
+      ---@type solarized.config
+      opts = {},
+      config = function(_, opts)
+        vim.o.termguicolors = true
+        vim.o.background = 'dark'
+        require('solarized').setup(opts)
+        vim.cmd.colorscheme 'solarized'
+      end,
     },
+
 
     {
     "hrsh7th/nvim-cmp",
@@ -74,40 +80,52 @@ require("lazy").setup({
             },
         })
     end,
-},
+    },
 
-{
-    "neovim/nvim-lspconfig",
-    config = function()
-        require("lspconfig").ts_ls.setup{}  -- Example for TypeScript server
-    end,
-},
+    {
+        "neovim/nvim-lspconfig",
+        config = function()
+            require("lspconfig").ts_ls.setup{}  -- Example for TypeScript server
+        end,
+    },
 
-{
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    opts = {
-        ensure_installed = { "bash", "html", "javascript", "json", "lua", "python" },  -- Add any other languages you need
-        highlight = { enable = true },
-    }
-},
+    {
+        "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate",
+        opts = {
+            ensure_installed = { "bash", "html", "javascript", "json", "lua", "python", "elixir", "php" },
+            highlight = { enable = true },
+        }
+    },
 
-{
-    "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    cmd = { "Telescope" },
-    opts = {
-        defaults = {
-            prompt_prefix = "> ",
-            sorting_strategy = "ascending",
-            layout_strategy = "flex",
-        },
-    }
-},
+    {
+        "nvim-telescope/telescope.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        cmd = { "Telescope" },
+        opts = {
+            defaults = {
+                prompt_prefix = "> ",
+                sorting_strategy = "ascending",
+                layout_strategy = "flex",
+            },
+        }
+    },
 
-{
-  'stevearc/conform.nvim',
-  opts = {},
-},
+
+    {
+      'stevearc/conform.nvim',
+      opts = {},
+    },
+
+
+    {
+        "windwp/nvim-autopairs",
+        event = "InsertEnter",
+        config = function()
+            require("nvim-autopairs").setup({})
+        end,
+    },
+
+
 })
 
