@@ -11,7 +11,7 @@
       "filetypes": ["python"],
     }
   },
-  "coc.preferences.formatOnSaveFiletypes": ["javascript", "typescript"],
+  "coc.preferences.formatOnSaveFiletypes": ["javascript", "typescript", "python"],
   "suggest.noselect": true,
   "svelte.enable-ts-plugin": true,
   "elixir.pathToElixirLS": "/usr/bin/elixir-ls"
