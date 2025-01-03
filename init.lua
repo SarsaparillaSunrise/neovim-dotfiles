@@ -35,57 +35,102 @@ vim.api.nvim_set_keymap('n', '<Leader>w', ':w<CR>', { noremap = true, silent = t
 -- Setup lazy.nvim
 require("lazy").setup({
     {
-      'maxmx03/solarized.nvim',
-      lazy = false,
-      priority = 1000,
-      ---@type solarized.config
-      opts = {},
-      config = function(_, opts)
-        vim.o.termguicolors = true
-        vim.o.background = 'dark'
-        require('solarized').setup(opts)
-        vim.cmd.colorscheme 'solarized'
-      end,
+        'maxmx03/solarized.nvim',
+        lazy = false,
+        priority = 1000,
+        ---@type solarized.config
+        opts = {},
+        config = function(_, opts)
+            vim.o.termguicolors = true
+            vim.o.background = 'dark'
+            require('solarized').setup(opts)
+            vim.cmd.colorscheme 'solarized'
+        end,
     },
 
 
     {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-        "hrsh7th/cmp-buffer",
-        "hrsh7th/cmp-path",
-        "L3MON4D3/LuaSnip",
-        "rafamadriz/friendly-snippets",
-        "onsails/lspkind.nvim"
-    },
-    event = "InsertEnter",
-    config = function()
-        local cmp = require("cmp")
-        cmp.setup({
-            snippet = {
-                expand = function(args)
-                    require("luasnip").lsp_expand(args.body)  -- For `luasnip` users.
-                end,
-            },
-            mapping = {
-                ["<C-n>"] = cmp.mapping.select_next_item(),
-                ["<C-p>"] = cmp.mapping.select_prev_item(),
-                ["<C-Space>"] = cmp.mapping.complete(),
-                ["<CR>"] = cmp.mapping.confirm({ select = true }),
-            },
-            sources = {
-                { name = "nvim_lsp" },
-                { name = "buffer" },
-                { name = "path" },
-            },
-        })
-    end,
-    },
-
-    {
-        "neovim/nvim-lspconfig",
+        "hrsh7th/nvim-cmp",
+        dependencies = {
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
+            "L3MON4D3/LuaSnip",
+            "rafamadriz/friendly-snippets",
+            "onsails/lspkind.nvim"
+        },
+        event = "InsertEnter",
         config = function()
-            require("lspconfig").ts_ls.setup{}  -- Example for TypeScript server
+            local cmp = require("cmp")
+            cmp.setup({
+                snippet = {
+                    expand = function(args)
+                        require("luasnip").lsp_expand(args.body)  -- For `luasnip` users.
+                    end,
+                },
+                mapping = {
+                    ["<C-n>"] = cmp.mapping.select_next_item(),
+                    ["<C-p>"] = cmp.mapping.select_prev_item(),
+                    ["<C-Space>"] = cmp.mapping.complete(),
+                    ["<CR>"] = cmp.mapping.confirm({ select = true }),
+                },
+                sources = {
+                    { name = "nvim_lsp" },
+                    { name = "buffer" },
+                    { name = "path" },
+                },
+            })
+        end,
+    },
+
+    {
+        'williamboman/mason.nvim',
+        build = ':MasonUpdate',  -- Optional: Update Mason on install
+        config = function()
+            require("mason").setup()
+        end,
+    },
+
+    {
+        'williamboman/mason-lspconfig.nvim',
+        dependencies = { 'williamboman/mason.nvim' },
+        config = function()
+            require("mason-lspconfig").setup({
+                ensure_installed = {
+                    "ts_ls",         -- TypeScript server
+                    "eslint",        -- JavaScript server
+                    "pyright",       -- Python server
+                    "elixirls",      -- Elixir server
+                    "intelephense",  -- PHP server
+                    "bashls",        -- Bash server
+                    "tailwindcss",   -- Tailwind CSS server
+                },
+                automatic_installation = true,  -- Automatically install configured servers
+            })
+        end,
+    },
+
+    {
+        'neovim/nvim-lspconfig',
+        dependencies = { 'williamboman/mason-lspconfig.nvim' },
+        config = function()
+            local servers = { "ts_ls", "eslint", "pyright", "elixirls", "intelephense", "bashls", "tailwindcss" }
+            for _, server in ipairs(servers) do
+                require('lspconfig')[server].setup({})
+            end
+        end,
+    },
+
+    {
+        'WhoIsSethDaniel/mason-tool-installer.nvim',
+        dependencies = { 'williamboman/mason.nvim' },
+        config = function()
+            require("mason-tool-installer").setup({
+                ensure_installed = {
+                    "prettier",  -- Code formatter for various languages
+                    "ruff",      -- Python linter
+                    "shellcheck" -- Shell script linter
+                },
+            })
         end,
     },
 
@@ -113,8 +158,8 @@ require("lazy").setup({
 
 
     {
-      'stevearc/conform.nvim',
-      opts = {},
+        'stevearc/conform.nvim',
+        opts = {},
     },
 
 
@@ -125,7 +170,6 @@ require("lazy").setup({
             require("nvim-autopairs").setup({})
         end,
     },
-
 
 })
 
