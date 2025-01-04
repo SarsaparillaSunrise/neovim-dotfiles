@@ -28,7 +28,11 @@ vim.api.nvim_set_keymap("n", "<Left>", ":bp<CR>", { noremap = true, silent = tru
 vim.api.nvim_set_keymap("n", "<Leader>bd", ":bd<CR>", { noremap = true, silent = true })
 
 
+-- PLugin bindings:
 vim.api.nvim_set_keymap('n', '\\', '<Cmd>Neotree toggle<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>t', '<Cmd>Telescope find_files<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>f', '<Cmd>Telescope live_grep<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>b', '<Cmd>Telescope buffers<CR>', { noremap = true, silent = true })
 
 -- TODO: Emacs bindings for command line:
 
