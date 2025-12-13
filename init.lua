@@ -25,6 +25,7 @@ vim.g.maplocalleader = ","
 -- Appearance
 vim.opt.number = true
 vim.opt.linebreak = true
+vim.opt.cursorline = true
 vim.opt.termguicolors = true -- Required for modern themes
 
 -- Behavior
@@ -88,24 +89,60 @@ keymap("n", "<F1>", ":echo<CR>", opts)
 -- ========================================================================== --
 require("lazy").setup({
 
-  -- 1. THEME: Solarized
-  { 
-    "maxmx03/solarized.nvim",
+--[[
+-- 1. THEME: Catppuccin (PARKED DUE TO PERSISTENT E474 ERROR)
+
+-- DEBUG LOG: The colorscheme call consistently fails with E474 (Invalid Argument)
+-- on the line running `vim.cmd("colorscheme...")`. This occurs regardless of:
+-- 1. Theme (solarized.nvim, nvim-solarized-lua, catppuccin/nvim)
+-- 2. Lua Wrapper (vim.cmd.colorscheme, vim.cmd, pcall(vim.api.nvim_command))
+-- 3. Lazy Trigger (config, cmd, event="VimEnter", init)
+-- CONCLUSION: The error is likely an environmental/timing bug specific to this
+-- environment's Neovim build/terminal startup, preventing the core :colorscheme
+-- command from being available when lazy.nvim executes its config functions.
+
+  {
+    "catppuccin/nvim", 
     lazy = false,
+    name = "catppuccin",
     priority = 1000,
+    
+    init = function()
+      -- CRITICAL: This is the safest place for the theme call, but it also failed.
+      -- We leave it here as a reminder of the best practice placement.
+      vim.cmd("colorscheme catppuccin") 
+    end,
+    
     config = function()
-      vim.o.background = "dark" -- Default, but we try to detect
-      vim.cmd.colorscheme 'solarized'
+      vim.o.background = "" -- Allow terminal to dictate light/dark
       
-      -- Attempt to respect terminal background changes
+      -- Set the initial flavor based on current background
+      local flavor = vim.o.background == "dark" and "mocha" or "latte"
+
+      require("catppuccin").setup({
+        flavour = flavor,
+        background = {
+          light = "latte", 
+          dark = "mocha",  
+        },
+        integrations = {
+          cmp = true, gitsigns = true, lualine = true,
+          neotree = true, telescope = true,
+        },
+      })
+
+      -- Autocmd for dynamic switching (if terminal changes theme)
       vim.api.nvim_create_autocmd("OptionSet", {
         pattern = "background",
         callback = function()
-          vim.cmd("colorscheme solarized")
+          local new_flavor = vim.o.background == "dark" and "mocha" or "latte"
+          require("catppuccin").set_default_options({ flavour = new_flavor })
+          vim.cmd("colorscheme catppuccin")
         end,
       })
     end
   },
+--]]
 
   -- 2. FILE EXPLORER (Replaces NERDTree)
   {
