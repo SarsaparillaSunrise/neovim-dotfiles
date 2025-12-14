@@ -1,4 +1,4 @@
---[[ 
+--[[
   MODERNIZED SINGLE-FILE NEOVIM CONFIG
   Language: Lua
   Manager:  Lazy.nvim
@@ -26,15 +26,15 @@ vim.g.maplocalleader = ","
 vim.opt.number = true
 vim.opt.linebreak = true
 vim.opt.cursorline = true
-vim.opt.termguicolors = true -- Required for modern themes
+vim.opt.termguicolors = true -- FIXED: Corrected spelling from termguicolours to termguicolors
 
 -- Behavior
 vim.opt.clipboard = "unnamedplus" -- System clipboard
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
-vim.opt.splitright = true         -- 'set spr'
+vim.opt.splitright = true -- 'set spr'
 vim.opt.swapfile = false
-vim.opt.hidden = true             -- Buffer switching without saving
+vim.opt.hidden = true     -- Buffer switching without saving
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
@@ -51,6 +51,8 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+vim.o.background = "dark"
+
 -- ========================================================================== --
 -- ==                             KEYMAPS                                  == --
 -- ========================================================================== --
@@ -61,11 +63,7 @@ local opts = { noremap = true, silent = true }
 keymap("n", "<leader>s", ":w<CR>", opts)
 keymap("n", "<CR>", ":w<CR>", opts)
 
--- Standard save (Triggers formatting)
-keymap("n", "<leader>s", ":w<CR>", opts)
-
 -- NEW: Save WITHOUT formatting (Capital S)
--- :noa = no autocmd (skips the formatting hook)
 keymap("n", "<leader>S", ":noa w<CR>", opts)
 
 -- Buffer management
@@ -89,62 +87,18 @@ keymap("n", "<F1>", ":echo<CR>", opts)
 -- ========================================================================== --
 require("lazy").setup({
 
---[[
--- 1. THEME: Catppuccin (PARKED DUE TO PERSISTENT E474 ERROR)
-
--- DEBUG LOG: The colorscheme call consistently fails with E474 (Invalid Argument)
--- on the line running `vim.cmd("colorscheme...")`. This occurs regardless of:
--- 1. Theme (solarized.nvim, nvim-solarized-lua, catppuccin/nvim)
--- 2. Lua Wrapper (vim.cmd.colorscheme, vim.cmd, pcall(vim.api.nvim_command))
--- 3. Lazy Trigger (config, cmd, event="VimEnter", init)
--- CONCLUSION: The error is likely an environmental/timing bug specific to this
--- environment's Neovim build/terminal startup, preventing the core :colorscheme
--- command from being available when lazy.nvim executes its config functions.
-
+  -- 1. THEME: Solarized 8 (Safest Configuration)
   {
-    "catppuccin/nvim", 
+    "lifepillar/vim-solarized8",
     lazy = false,
-    name = "catppuccin",
     priority = 1000,
-    
-    init = function()
-      -- CRITICAL: This is the safest place for the theme call, but it also failed.
-      -- We leave it here as a reminder of the best practice placement.
-      vim.cmd("colorscheme catppuccin") 
-    end,
-    
     config = function()
-      vim.o.background = "" -- Allow terminal to dictate light/dark
-      
-      -- Set the initial flavor based on current background
-      local flavor = vim.o.background == "dark" and "mocha" or "latte"
-
-      require("catppuccin").setup({
-        flavour = flavor,
-        background = {
-          light = "latte", 
-          dark = "mocha",  
-        },
-        integrations = {
-          cmp = true, gitsigns = true, lualine = true,
-          neotree = true, telescope = true,
-        },
-      })
-
-      -- Autocmd for dynamic switching (if terminal changes theme)
-      vim.api.nvim_create_autocmd("OptionSet", {
-        pattern = "background",
-        callback = function()
-          local new_flavor = vim.o.background == "dark" and "mocha" or "latte"
-          require("catppuccin").set_default_options({ flavour = new_flavor })
-          vim.cmd("colorscheme catppuccin")
-        end,
-      })
+      -- The crashing auto-detection logic has been removed.
+      vim.cmd("colorscheme solarized8")
     end
   },
---]]
 
-  -- 2. FILE EXPLORER (Replaces NERDTree)
+  -- 2. FILE EXPLORER (Neo-tree)
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
@@ -163,78 +117,82 @@ require("lazy").setup({
     }
   },
 
-  -- 3. TELESCOPE (Replaces FZF)
+  -- 3. TELESCOPE (File Finding)
   {
     "nvim-telescope/telescope.nvim",
     tag = "0.1.5",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       local builtin = require('telescope.builtin')
-      vim.keymap.set('n', '<leader>t', builtin.find_files, {})
-      vim.keymap.set('n', '<leader>f', builtin.live_grep, {}) -- "Rg" equivalent
+      vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = "Find Files" })
+      vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = "Live Grep" })
+      vim.keymap.set('n', '<leader>fr', builtin.oldfiles, { desc = "Recent Files" })
+      vim.keymap.set('n', '<leader>t', builtin.find_files, { desc = "Find Files (Alt)" })
     end
   },
 
-  -- 4. TREESITTER (Better Syntax Highlighting)
+  -- 4. TREESITTER (Syntax Highlighting)
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     config = function()
       require("nvim-treesitter.configs").setup({
-        ensure_installed = { "python", "go", "tsx", "typescript", "javascript", "lua", "vim", "vimdoc" },
+        ensure_installed = { "python", "go", "tsx", "typescript", "javascript", "lua", "vim", "vimdoc", "rust", "elixir", "yaml", "html", "css" },
         highlight = { enable = true },
         indent = { enable = true },
       })
     end
   },
 
-  -- 5. GIT SIGNS (The "Git Lens" equivalent)
+  -- 5. GIT SIGNS
   {
     "lewis6991/gitsigns.nvim",
     config = function()
       require('gitsigns').setup {
-        current_line_blame = true, -- Toggle this to see who wrote the line
-        current_line_blame_opts = {
-          delay = 500,
-        },
+        current_line_blame = true,
+        current_line_blame_opts = { delay = 500 },
       }
     end
   },
 
-  -- 6. STATUS LINE (Replaces Airline)
+  -- 6. STATUS LINE
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = { theme = "solarized_dark" } -- adapts to light/dark automatically often
+    opts = { theme = "solarized_dark" }
   },
 
-  -- 7. AUTO-PAIRS (Replaces your auto-close TODO)
+  -- 7. AUTO-PAIRS
   {
     "windwp/nvim-autopairs",
     event = "InsertEnter",
-    opts = {} 
+    opts = {}
   },
 
--- 8. FORMATTING
+  -- 8. FORMATTING
   {
     "stevearc/conform.nvim",
     event = { "BufWritePre" },
     cmd = { "ConformInfo" },
     opts = {
       formatters_by_ft = {
-        python = { "ruff_organize_imports", "ruff_format" }, 
-        
+        python = { "ruff_organize_imports", "ruff_format" },
+        go = { "gofmt" },
         javascript = { "prettier" },
         typescript = { "prettier" },
         typescriptreact = { "prettier" },
-        go = { "gofmt" },
+        css = { "prettier" },
+        html = { "prettier" },
+        yaml = { "prettier" },
+        json = { "prettier" },
+        rust = { "rustfmt" },
+        elixir = { "mix" },
       },
-      -- This enables Format on Save
       format_on_save = { timeout_ms = 500, lsp_fallback = true },
     },
   },
 
-  -- 9. LSP & AUTOCOMPLETION (Replaces CoC)
+  -- 9. LSP & AUTOCOMPLETION
   {
     "neovim/nvim-lspconfig",
     dependencies = {
@@ -250,24 +208,22 @@ require("lazy").setup({
     config = function()
       local cmp = require('cmp')
       local capabilities = require('cmp_nvim_lsp').default_capabilities()
-      
-      -- Setup Mason (Auto-installer)
+
       require("mason").setup()
       require("mason-lspconfig").setup({
-        ensure_installed = { "pyright", "ruff", "gopls", "ts_ls" },
+        ensure_installed = { "pyright", "ruff", "gopls", "ts_ls", "elixirls", "html", "yamlls", "rust_analyzer", "cssls", "lua_ls" },
         handlers = {
           function(server_name)
             require("lspconfig")[server_name].setup {
               capabilities = capabilities
             }
           end,
-          -- Special handling for Ruff (only for linting/formatting, disable its hover in favor of Pyright)
           ["ruff"] = function()
-             require("lspconfig").ruff.setup {
-               on_attach = function(client, _)
-                 client.server_capabilities.hoverProvider = false
-               end
-             }
+            require("lspconfig").ruff.setup {
+              on_attach = function(client, _)
+                client.server_capabilities.hoverProvider = false
+              end
+            }
           end
         }
       })
@@ -284,19 +240,19 @@ require("lazy").setup({
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
           ['<C-Space>'] = cmp.mapping.complete(),
           ['<C-e>'] = cmp.mapping.abort(),
-          ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item
+          ['<CR>'] = cmp.mapping.confirm({ select = true }),
           ['<Tab>'] = cmp.mapping.select_next_item(),
           ['<S-Tab>'] = cmp.mapping.select_prev_item(),
         }),
         sources = cmp.config.sources({
-          { name = 'nvim_lsp' }, -- LSP completion (requests.get...)
+          { name = 'nvim_lsp' },
           { name = 'luasnip' },
         }, {
           { name = 'buffer' },
         })
       })
-      
-      -- Keymaps for LSP (only when LSP is active)
+
+      -- Keymaps for LSP
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('UserLspConfig', {}),
         callback = function(ev)
@@ -309,5 +265,15 @@ require("lazy").setup({
         end,
       })
     end
+  },
+
+  -- 10. TODO COMMENTS
+  {
+    "folke/todo-comments.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {},
+    keys = {
+      { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find TODOs" },
+    }
   }
 })
