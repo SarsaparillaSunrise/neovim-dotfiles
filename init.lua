@@ -51,8 +51,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
-vim.o.background = "dark"
-
 -- ========================================================================== --
 -- ==                             KEYMAPS                                  == --
 -- ========================================================================== --
@@ -93,7 +91,8 @@ require("lazy").setup({
     lazy = false,
     priority = 1000,
     config = function()
-      -- The crashing auto-detection logic has been removed.
+      -- Now that termguicolors is fixed and background is set by the theme,
+      -- we only need the colorscheme command.
       vim.cmd("colorscheme solarized8")
     end
   },
