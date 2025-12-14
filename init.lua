@@ -274,5 +274,33 @@ require("lazy").setup({
     keys = {
       { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find TODOs" },
     }
-  }
+  },
+
+  -- 11. COMMENTING
+  {
+    "numToStr/Comment.nvim",
+    -- TODO: The `<leader>cc` keymap is currently disabled due to a persistent API/loading conflict.
+    -- Use the built-in 'gcc' for now. To re-enable the custom keymap later, uncomment the 'keys' block below,
+    -- and use the 'lazy = false' and 'config = function() ... end' structure we attempted previously.
+    keys = {
+      -- { "<leader>cc", mode = { "n", "v" }, desc = "Toggle Comment (FIX ME)" },
+    },
+    opts = {},
+  },
+
+  -- 12. AUTO-CLOSING TAGS (for HTML/TSX/JSX)
+  {
+    "windwp/nvim-ts-autotag",
+    ft = { "html", "javascript", "typescript", "javascriptreact", "typescriptreact" },
+    opts = {},
+  },
+
+  -- 13. TELESCOPE FZF NATIVE (Performance Boost)
+  {
+    "nvim-telescope/telescope-fzf-native.nvim",
+    build = "make",
+    cond = function()
+      return vim.fn.executable("make") == 1
+    end,
+  },
 })
