@@ -130,15 +130,26 @@ require("lazy").setup({
     end
   },
 
-  -- 4. TREESITTER (Syntax Highlighting)
+  -- 4. TREESITTER (Syntax Highlighting & Parsers)
   {
     "nvim-treesitter/nvim-treesitter",
+    lazy = false,
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = { "python", "go", "tsx", "typescript", "javascript", "lua", "vim", "vimdoc", "rust", "elixir", "yaml", "html", "css" },
-        highlight = { enable = true },
-        indent = { enable = true },
+      local ts = require("nvim-treesitter")
+
+      -- 1. Tell Treesitter to install your languages
+      ts.install({
+        "python", "go", "tsx", "typescript", "javascript",
+        "lua", "vim", "vimdoc", "rust", "elixir", "yaml", "html", "css"
+      })
+
+      -- 2. Turn on native Neovim highlighting and indents globally
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function()
+          pcall(vim.treesitter.start)
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
       })
     end
   },
