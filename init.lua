@@ -39,6 +39,8 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
+vim.opt.fixendofline = false
+vim.opt.endofline = false
 
 -- Restore cursor position
 vim.api.nvim_create_autocmd("BufReadPost", {
@@ -122,10 +124,8 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       local builtin = require('telescope.builtin')
-      vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = "Find Files" })
-      vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = "Live Grep" })
-      vim.keymap.set('n', '<leader>fr', builtin.oldfiles, { desc = "Recent Files" })
-      vim.keymap.set('n', '<leader>t', builtin.find_files, { desc = "Find Files (Alt)" })
+      vim.keymap.set('n', '<leader>f', builtin.live_grep, { desc = "Live Grep" })
+      vim.keymap.set('n', '<leader>t', builtin.find_files, { desc = "Find Files" })
     end
   },
 
@@ -185,7 +185,9 @@ require("lazy").setup({
     cmd = { "ConformInfo" },
     opts = {
       formatters_by_ft = {
-        python = { "ruff_organize_imports", "ruff_format" },
+        -- Disabled for legacy codebase; re-enable for normal projects.
+        -- python = { "ruff_organize_imports", "ruff_format" },
+        python = { "ruff_format" },
         go = { "gofmt" },
         javascript = { "prettier" },
         typescript = { "prettier" },
@@ -220,7 +222,7 @@ require("lazy").setup({
 
       require("mason").setup()
       require("mason-lspconfig").setup({
-        ensure_installed = { "pyright", "ruff", "gopls", "ts_ls", "elixirls", "html", "yamlls", "rust_analyzer", "cssls", "lua_ls" },
+        ensure_installed = { "pyright", "ruff", "ts_ls", "elixirls", "html", "yamlls", "rust_analyzer", "cssls", "lua_ls" },
         handlers = {
           function(server_name)
             require("lspconfig")[server_name].setup {
@@ -268,7 +270,7 @@ require("lazy").setup({
           local opts = { buffer = ev.buf }
           vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
           vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-          vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+          vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, opts)
           vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
           vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
         end,
@@ -281,9 +283,6 @@ require("lazy").setup({
     "folke/todo-comments.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {},
-    keys = {
-      { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find TODOs" },
-    }
   },
 
   -- 11. COMMENTING
