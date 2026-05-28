@@ -115,6 +115,14 @@ require("lazy").setup({
       filesystem = {
         filtered_items = { hide_dotfiles = false, hide_gitignored = false },
       },
+      event_handlers = {
+        {
+          event = "file_opened",
+          handler = function()
+            require("neo-tree.command").execute({ action = "close" })
+          end,
+        },
+      },
     }
   },
 
