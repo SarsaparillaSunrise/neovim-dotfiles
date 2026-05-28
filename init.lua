@@ -288,11 +288,9 @@ require("lazy").setup({
   -- 11. COMMENTING
   {
     "numToStr/Comment.nvim",
-    -- TODO: The `<leader>cc` keymap is currently disabled due to a persistent API/loading conflict.
-    -- Use the built-in 'gcc' for now. To re-enable the custom keymap later, uncomment the 'keys' block below,
-    -- and use the 'lazy = false' and 'config = function() ... end' structure we attempted previously.
     keys = {
-      -- { "<leader>cc", mode = { "n", "v" }, desc = "Toggle Comment (FIX ME)" },
+      { "<leader>cc", "gcc", mode = "n", remap = true, desc = "Toggle Comment" },
+      { "<leader>cc", "gc",  mode = "v", remap = true, desc = "Toggle Comment" },
     },
     opts = {},
   },
