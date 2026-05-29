@@ -41,6 +41,20 @@ vim.opt.hlsearch = true
 vim.opt.incsearch = true
 vim.opt.fixendofline = false
 vim.opt.endofline = false
+vim.opt.updatetime = 300 -- Faster CursorHold for diagnostic floats
+
+-- Diagnostics
+vim.diagnostic.config({
+  virtual_text = { prefix = "●", spacing = 2 },
+  severity_sort = true,
+  float = { border = "rounded", source = true },
+})
+
+vim.api.nvim_create_autocmd("CursorHold", {
+  callback = function()
+    vim.diagnostic.open_float(nil, { focus = false, scope = "cursor" })
+  end,
+})
 
 -- Restore cursor position
 vim.api.nvim_create_autocmd("BufReadPost", {
@@ -281,6 +295,9 @@ require("lazy").setup({
           vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, opts)
           vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
           vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
+          vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+          vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end, opts)
+          vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end, opts)
         end,
       })
     end
