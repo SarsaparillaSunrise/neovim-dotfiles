@@ -245,20 +245,25 @@ require("lazy").setup({
       require("mason").setup()
       require("mason-lspconfig").setup({
         ensure_installed = { "pyright", "ruff", "ts_ls", "elixirls", "html", "yamlls", "rust_analyzer", "cssls", "lua_ls" },
-        handlers = {
-          function(server_name)
-            require("lspconfig")[server_name].setup {
-              capabilities = capabilities
-            }
-          end,
-          ["ruff"] = function()
-            require("lspconfig").ruff.setup {
-              on_attach = function(client, _)
-                client.server_capabilities.hoverProvider = false
-              end
-            }
+      })
+
+      vim.lsp.config("*", { capabilities = capabilities })
+
+      vim.lsp.config("pyright", {
+        before_init = function(_, config)
+          local venv = vim.fn.getcwd() .. "/.venv/bin/python"
+          if vim.fn.filereadable(venv) == 1 then
+            config.settings = config.settings or {}
+            config.settings.python = config.settings.python or {}
+            config.settings.python.pythonPath = venv
           end
-        }
+        end,
+      })
+
+      vim.lsp.config("ruff", {
+        on_attach = function(client, _)
+          client.server_capabilities.hoverProvider = false
+        end,
       })
 
       -- Autocompletion Setup
