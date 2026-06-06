@@ -8,7 +8,7 @@
 -- ==                           BOOTSTRAP LAZY                             == --
 -- ========================================================================== --
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git", "clone", "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath,
@@ -26,7 +26,7 @@ vim.g.maplocalleader = ","
 vim.opt.number = true
 vim.opt.linebreak = true
 vim.opt.cursorline = true
-vim.opt.termguicolors = true -- FIXED: Corrected spelling from termguicolours to termguicolors
+vim.opt.termguicolors = true
 
 -- Behavior
 vim.opt.clipboard = "unnamedplus" -- System clipboard
@@ -45,15 +45,9 @@ vim.opt.updatetime = 300 -- Faster CursorHold for diagnostic floats
 
 -- Diagnostics
 vim.diagnostic.config({
-  virtual_text = { prefix = "●", spacing = 2 },
+  virtual_text = false,
   severity_sort = true,
   float = { border = "rounded", source = true },
-})
-
-vim.api.nvim_create_autocmd("CursorHold", {
-  callback = function()
-    vim.diagnostic.open_float(nil, { focus = false, scope = "cursor" })
-  end,
 })
 
 -- Restore cursor position
@@ -77,7 +71,7 @@ local opts = { noremap = true, silent = true }
 keymap("n", "<leader>s", ":w<CR>", opts)
 keymap("n", "<CR>", ":w<CR>", opts)
 
--- NEW: Save WITHOUT formatting (Capital S)
+-- Save without formatting
 keymap("n", "<leader>S", ":noa w<CR>", opts)
 
 -- Buffer management
@@ -133,7 +127,7 @@ require("lazy").setup({
         {
           event = "file_opened",
           handler = function()
-            require("neo-tree.command").execute({ action = "close" })
+            vim.cmd("Neotree close")
           end,
         },
       },
@@ -245,6 +239,7 @@ require("lazy").setup({
       require("mason").setup()
       require("mason-lspconfig").setup({
         ensure_installed = { "pyright", "ruff", "ts_ls", "elixirls", "html", "yamlls", "rust_analyzer", "cssls", "lua_ls" },
+        automatic_enable = true,
       })
 
       vim.lsp.config("*", { capabilities = capabilities })
@@ -339,5 +334,27 @@ require("lazy").setup({
     cond = function()
       return vim.fn.executable("make") == 1
     end,
+  },
+
+  -- 14. SYMBOLS OUTLINE (Aerial)
+  {
+    "stevearc/aerial.nvim",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons",
+    },
+    keys = {
+      { "<leader>o", "<cmd>AerialToggle<CR>", desc = "Toggle Symbols Outline" },
+    },
+    opts = {
+      backends = { "lsp", "treesitter", "markdown", "man" },
+      layout = {
+        default_direction = "right",
+        placement = "edge",
+        width = 35,
+      },
+      attach_mode = "global",
+      show_guides = true,
+    },
   },
 })
