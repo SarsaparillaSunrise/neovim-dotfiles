@@ -45,9 +45,15 @@ vim.opt.updatetime = 300 -- Faster CursorHold for diagnostic floats
 
 -- Diagnostics
 vim.diagnostic.config({
-  virtual_text = false,
+  virtual_text = { prefix = "●", spacing = 2 },
   severity_sort = true,
   float = { border = "rounded", source = true },
+})
+
+vim.api.nvim_create_autocmd("CursorHold", {
+  callback = function()
+    vim.diagnostic.open_float(nil, { focus = false, scope = "cursor" })
+  end,
 })
 
 -- Restore cursor position
@@ -226,6 +232,7 @@ require("lazy").setup({
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-nvim-lsp-signature-help",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
       "hrsh7th/cmp-cmdline",
@@ -253,6 +260,16 @@ require("lazy").setup({
             config.settings.python.pythonPath = venv
           end
         end,
+        settings = {
+          python = {
+            analysis = {
+              autoImportCompletions = true,
+              indexing = true,
+              useLibraryCodeForTypes = true,
+              diagnosticMode = "workspace",
+            },
+          },
+        },
       })
 
       vim.lsp.config("ruff", {
@@ -279,6 +296,7 @@ require("lazy").setup({
         }),
         sources = cmp.config.sources({
           { name = 'nvim_lsp' },
+          { name = 'nvim_lsp_signature_help' },
           { name = 'luasnip' },
         }, {
           { name = 'buffer' },
