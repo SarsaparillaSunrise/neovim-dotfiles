@@ -245,13 +245,13 @@ require("lazy").setup({
 
       require("mason").setup()
       require("mason-lspconfig").setup({
-        ensure_installed = { "pyright", "ruff", "ts_ls", "elixirls", "html", "yamlls", "rust_analyzer", "cssls", "lua_ls" },
+        ensure_installed = { "basedpyright", "ruff", "ts_ls", "elixirls", "html", "yamlls", "rust_analyzer", "cssls", "lua_ls" },
         automatic_enable = true,
       })
 
       vim.lsp.config("*", { capabilities = capabilities })
 
-      vim.lsp.config("pyright", {
+      vim.lsp.config("basedpyright", {
         before_init = function(_, config)
           local venv = vim.fn.getcwd() .. "/.venv/bin/python"
           if vim.fn.filereadable(venv) == 1 then
