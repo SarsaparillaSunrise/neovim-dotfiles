@@ -162,7 +162,7 @@ require("lazy").setup({
       -- 1. Tell Treesitter to install your languages
       ts.install({
         "python", "go", "tsx", "typescript", "javascript",
-        "lua", "vim", "vimdoc", "rust", "elixir", "yaml", "html", "css"
+        "lua", "vim", "vimdoc", "rust", "elixir", "yaml", "html", "css", "sql"
       })
 
       -- 2. Turn on native Neovim highlighting and indents globally
