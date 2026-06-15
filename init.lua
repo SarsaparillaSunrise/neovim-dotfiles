@@ -77,6 +77,15 @@ local opts = { noremap = true, silent = true }
 keymap("n", "<leader>s", ":w<CR>", opts)
 keymap("n", "<CR>", ":w<CR>", opts)
 
+-- Don't hijack <CR> in special buffers (quickfix, Telescope results, help, etc.)
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  callback = function(ev)
+    if vim.bo[ev.buf].buftype ~= "" then
+      vim.keymap.set("n", "<CR>", "<CR>", { buffer = ev.buf, remap = true })
+    end
+  end,
+})
+
 -- Save without formatting
 keymap("n", "<leader>S", ":noa w<CR>", opts)
 
@@ -310,6 +319,10 @@ require("lazy").setup({
           local opts = { buffer = ev.buf }
           vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
           vim.keymap.set('n', 'gd', require('telescope.builtin').lsp_definitions, opts)
+          vim.keymap.set('n', 'gr', require('telescope.builtin').lsp_references, opts)
+          vim.keymap.set('n', 'gi', require('telescope.builtin').lsp_implementations, opts)
+          vim.keymap.set('n', '<leader>ds', require('telescope.builtin').lsp_document_symbols, opts)
+          vim.keymap.set('n', '<leader>ws', require('telescope.builtin').lsp_workspace_symbols, opts)
           vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, opts)
           vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
           vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
