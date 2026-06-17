@@ -171,7 +171,7 @@ require("lazy").setup({
       -- 1. Tell Treesitter to install your languages
       ts.install({
         "python", "go", "tsx", "typescript", "javascript",
-        "lua", "vim", "vimdoc", "rust", "elixir", "yaml", "html", "css", "sql"
+        "lua", "vim", "vimdoc", "rust", "elixir", "yaml", "html", "css", "sql", "julia"
       })
 
       -- 2. Turn on native Neovim highlighting and indents globally
@@ -254,7 +254,7 @@ require("lazy").setup({
 
       require("mason").setup()
       require("mason-lspconfig").setup({
-        ensure_installed = { "basedpyright", "ruff", "ts_ls", "elixirls", "html", "yamlls", "rust_analyzer", "cssls", "lua_ls" },
+        ensure_installed = { "basedpyright", "ruff", "ts_ls", "elixirls", "html", "yamlls", "rust_analyzer", "cssls", "lua_ls", "julials" },
         automatic_enable = true,
       })
 
