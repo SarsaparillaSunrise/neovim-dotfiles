@@ -80,9 +80,15 @@ keymap("n", "<CR>", ":w<CR>", opts)
 -- Don't hijack <CR> in special buffers (quickfix, Telescope results, help, etc.)
 vim.api.nvim_create_autocmd("BufWinEnter", {
   callback = function(ev)
-    if vim.bo[ev.buf].buftype ~= "" then
-      vim.keymap.set("n", "<CR>", "<CR>", { buffer = ev.buf, remap = true })
+    if vim.bo[ev.buf].buftype == "" then
+      return
     end
+    -- If the buffer (or its plugin) already binds <CR> itself — aerial,
+    -- diffview panels, etc. — leave it alone instead of clobbering it.
+    if vim.fn.maparg("<CR>", "n", false, true).buffer == 1 then
+      return
+    end
+    vim.keymap.set("n", "<CR>", "<CR>", { buffer = ev.buf, remap = true })
   end,
 })
 
