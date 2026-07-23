@@ -367,7 +367,32 @@ require("lazy").setup({
     end,
   },
 
-  -- 14. SYMBOLS OUTLINE (Aerial)
+  -- 14b. DIFFVIEW (Merge Conflict Resolution & Diffs)
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
+    keys = {
+      { "<leader>gm", "<cmd>DiffviewOpen<CR>",        desc = "Diffview: open (merge/diff)" },
+      { "<leader>gc", "<cmd>DiffviewClose<CR>",       desc = "Diffview: close" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory %<CR>", desc = "Diffview: file history" },
+    },
+    opts = {
+      -- Put a proper 3-way merge layout front and center:
+      -- top row = OURS | BASE | THEIRS, bottom = the file you're writing.
+      view = {
+        merge_tool = {
+          -- Small screen: a single full-width window with inline conflict
+          -- markers. ,co/,ct/,cb/,ca still work off the markers, so we lose
+          -- nothing but the (cramped) side-by-side context panes.
+          layout = "diff1_plain",
+          disable_diagnostics = true,
+        },
+      },
+    },
+  },
+
+  -- 15. SYMBOLS OUTLINE (Aerial)
   {
     "stevearc/aerial.nvim",
     dependencies = {
