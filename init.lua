@@ -449,4 +449,53 @@ require("lazy").setup({
     },
     opts = {},
   },
+
+  -- 17. DEBUGGER (nvim-dap + Python)
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+      "nvim-neotest/nvim-nio",
+      "mfussenegger/nvim-dap-python",
+    },
+    keys = {
+      { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "DAP: breakpoint" },
+      { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input("Condition: ")) end, desc = "DAP: conditional breakpoint" },
+      { "<leader>dc", function() require("dap").continue() end, desc = "DAP: continue / start" },
+      { "<leader>dn", function() require("dap").step_over() end, desc = "DAP: step over" },
+      { "<leader>di", function() require("dap").step_into() end, desc = "DAP: step into" },
+      { "<leader>do", function() require("dap").step_out() end, desc = "DAP: step out" },
+      { "<leader>dq", function() require("dap").terminate() end, desc = "DAP: terminate" },
+      { "<leader>du", function() require("dapui").toggle() end, desc = "DAP: toggle UI" },
+    },
+    config = function()
+      local dap, dapui = require("dap"), require("dapui")
+      dapui.setup()
+
+      -- Use the project venv's python if it has debugpy, else fall back.
+      local venv = vim.fn.getcwd() .. "/.venv/bin/python"
+      require("dap-python").setup(vim.fn.filereadable(venv) == 1 and venv or "python")
+
+      -- FastAPI: launch uvicorn under the debugger. --reload is deliberately
+      -- omitted; its subprocess reloader detaches from debugpy so breakpoints
+      -- wouldn't hit.
+      table.insert(dap.configurations.python, {
+        type = "python",
+        request = "launch",
+        name = "FastAPI (uvicorn)",
+        module = "uvicorn",
+        args = function()
+          return { vim.fn.input("App target: ", "app.main:app") }
+        end,
+        justMyCode = false,
+        console = "integratedTerminal",
+      })
+
+      -- Auto-open/close the UI with the session.
+      dap.listeners.before.attach.dapui_config = function() dapui.open() end
+      dap.listeners.before.launch.dapui_config = function() dapui.open() end
+      dap.listeners.before.event_terminated.dapui_config = function() dapui.close() end
+      dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
+    end,
+  },
 })
