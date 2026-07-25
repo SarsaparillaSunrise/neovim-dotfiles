@@ -239,22 +239,16 @@ require("lazy").setup({
     },
   },
 
-  -- 9. LSP & AUTOCOMPLETION
+  -- 9. LSP
   {
     "neovim/nvim-lspconfig",
     dependencies = {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-nvim-lsp-signature-help",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
-      "hrsh7th/nvim-cmp",
-      "L3MON4D3/LuaSnip",
+      "saghen/blink.cmp",
     },
     config = function()
-      local cmp = require('cmp')
-      local capabilities = require('cmp_nvim_lsp').default_capabilities()
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
 
       require("mason").setup()
       require("mason-lspconfig").setup({
@@ -291,37 +285,6 @@ require("lazy").setup({
         end,
       })
 
-      -- Autocompletion Setup
-      cmp.setup({
-        -- Don't autocomplete in prose buffers (no filetype, markdown, org).
-        -- Keeps <CR> as a plain newline there instead of confirming a stray match.
-        enabled = function()
-          local prose = { [""] = true, markdown = true, org = true, text = true }
-          return not prose[vim.bo.filetype]
-        end,
-        snippet = {
-          expand = function(args)
-            require('luasnip').lsp_expand(args.body)
-          end,
-        },
-        mapping = cmp.mapping.preset.insert({
-          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-          ['<C-f>'] = cmp.mapping.scroll_docs(4),
-          ['<C-Space>'] = cmp.mapping.complete(),
-          ['<C-e>'] = cmp.mapping.abort(),
-          ['<CR>'] = cmp.mapping.confirm({ select = true }),
-          ['<Tab>'] = cmp.mapping.select_next_item(),
-          ['<S-Tab>'] = cmp.mapping.select_prev_item(),
-        }),
-        sources = cmp.config.sources({
-          { name = 'nvim_lsp' },
-          { name = 'nvim_lsp_signature_help' },
-          { name = 'luasnip' },
-        }, {
-          { name = 'buffer' },
-        })
-      })
-
       -- Keymaps for LSP
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('UserLspConfig', {}),
@@ -342,6 +305,40 @@ require("lazy").setup({
         end,
       })
     end
+  },
+
+  -- 9b. AUTOCOMPLETION (blink.cmp)
+  {
+    "saghen/blink.cmp",
+    version = "1.*", -- release tag ships a prebuilt fuzzy binary (no cargo needed)
+    opts = {
+      -- Don't complete in prose buffers (no filetype, markdown, org, text),
+      -- so <CR> stays a plain newline there instead of confirming a stray match.
+      enabled = function()
+        local prose = { [""] = true, markdown = true, org = true, text = true }
+        return not prose[vim.bo.filetype]
+      end,
+      -- Mirror the old nvim-cmp bindings: Tab/S-Tab cycle, <CR> confirms.
+      keymap = {
+        preset = "none",
+        ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<C-e>"] = { "hide" },
+        ["<CR>"] = { "accept", "fallback" },
+        ["<Tab>"] = { "select_next", "fallback" },
+        ["<S-Tab>"] = { "select_prev", "fallback" },
+        ["<C-b>"] = { "scroll_documentation_up", "fallback" },
+        ["<C-f>"] = { "scroll_documentation_down", "fallback" },
+      },
+      sources = {
+        default = { "lsp", "path", "snippets", "buffer" },
+      },
+      completion = {
+        documentation = { auto_show = true },
+      },
+      signature = { enabled = true },
+      -- No command-line completion (matches the previous setup).
+      cmdline = { enabled = false },
+    },
   },
 
   -- 10. TODO COMMENTS
