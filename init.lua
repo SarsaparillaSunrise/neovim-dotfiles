@@ -174,7 +174,7 @@ require("lazy").setup({
       -- 1. Tell Treesitter to install your languages
       ts.install({
         "python", "go", "tsx", "typescript", "javascript",
-        "lua", "vim", "vimdoc", "rust", "elixir", "yaml", "html", "css", "sql", "julia"
+        "lua", "vim", "vimdoc", "rust", "elixir", "yaml", "html", "css", "sql", "julia", "http", "json"
       })
 
       -- 2. Turn on native Neovim highlighting and indents globally
@@ -432,5 +432,21 @@ require("lazy").setup({
       attach_mode = "global",
       show_guides = true,
     },
+  },
+
+  -- 16. HTTP CLIENT (Kulala) — run .http requests in-editor
+  {
+    "mistweaverco/kulala.nvim",
+    ft = { "http", "rest" },
+    init = function()
+      vim.filetype.add({ extension = { http = "http" } })
+    end,
+    keys = {
+      { "<leader>Rs", function() require("kulala").run() end,        ft = "http", desc = "HTTP: send request" },
+      { "<leader>Ra", function() require("kulala").run_all() end,    ft = "http", desc = "HTTP: send all in file" },
+      { "<leader>Rr", function() require("kulala").replay() end,     ft = "http", desc = "HTTP: replay last" },
+      { "<leader>Rt", function() require("kulala").toggle_view() end, ft = "http", desc = "HTTP: toggle body/headers" },
+    },
+    opts = {},
   },
 })
