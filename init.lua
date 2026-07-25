@@ -295,6 +295,12 @@ require("lazy").setup({
 
       -- Autocompletion Setup
       cmp.setup({
+        -- Don't autocomplete in prose buffers (no filetype, markdown, org).
+        -- Keeps <CR> as a plain newline there instead of confirming a stray match.
+        enabled = function()
+          local prose = { [""] = true, markdown = true, org = true, text = true }
+          return not prose[vim.bo.filetype]
+        end,
         snippet = {
           expand = function(args)
             require('luasnip').lsp_expand(args.body)
