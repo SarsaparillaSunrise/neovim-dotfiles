@@ -302,6 +302,28 @@ require("lazy").setup({
           vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
           vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end, opts)
           vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end, opts)
+
+          local client = vim.lsp.get_client_by_id(ev.data.client_id)
+
+          -- Inlay hints: inferred types + parameter names at call sites.
+          if client and client:supports_method('textDocument/inlayHint') then
+            vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+            vim.keymap.set('n', '<leader>ih', function()
+              local on = vim.lsp.inlay_hint.is_enabled({ bufnr = ev.buf })
+              vim.lsp.inlay_hint.enable(not on, { bufnr = ev.buf })
+            end, opts)
+          end
+
+          -- Highlight other uses of the symbol under the cursor (PyCharm-style).
+          if client and client:supports_method('textDocument/documentHighlight') then
+            local grp = vim.api.nvim_create_augroup('UserDocHighlight' .. ev.buf, { clear = true })
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              group = grp, buffer = ev.buf, callback = vim.lsp.buf.document_highlight,
+            })
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI', 'InsertEnter' }, {
+              group = grp, buffer = ev.buf, callback = vim.lsp.buf.clear_references,
+            })
+          end
         end,
       })
     end
