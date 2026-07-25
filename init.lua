@@ -508,4 +508,43 @@ require("lazy").setup({
     },
     opts = {},
   },
+
+  -- 19. HARPOON — pin a handful of files and jump between them
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      { "<leader>a", function() require("harpoon"):list():add() end, desc = "Harpoon: pin file" },
+      { "<leader>h", function() local h = require("harpoon"); h.ui:toggle_quick_menu(h:list()) end, desc = "Harpoon: menu" },
+      { "<leader>1", function() require("harpoon"):list():select(1) end, desc = "Harpoon: file 1" },
+      { "<leader>2", function() require("harpoon"):list():select(2) end, desc = "Harpoon: file 2" },
+      { "<leader>3", function() require("harpoon"):list():select(3) end, desc = "Harpoon: file 3" },
+      { "<leader>4", function() require("harpoon"):list():select(4) end, desc = "Harpoon: file 4" },
+    },
+    config = function()
+      require("harpoon"):setup()
+    end,
+  },
+
+  -- 20. BREADCRUMBS (dropbar) — path + code context in the winbar
+  {
+    "Bekaboo/dropbar.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {},
+  },
+
+  -- 21. REFACTORING — extract function / variable / inline
+  {
+    "ThePrimeagen/refactoring.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "lewis6991/async.nvim",
+    },
+    keys = {
+      { "<leader>rr", function() require("refactoring").select_refactor() end, mode = { "n", "x" }, desc = "Refactor: menu" },
+    },
+    opts = {},
+  },
 })
