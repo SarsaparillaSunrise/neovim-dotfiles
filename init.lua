@@ -498,4 +498,14 @@ require("lazy").setup({
       dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
     end,
   },
+
+  -- 18. FIND & REPLACE (grug-far) — project-wide, with live preview
+  {
+    "MagicDuck/grug-far.nvim",
+    cmd = "GrugFar",
+    keys = {
+      { "<leader>sr", function() require("grug-far").open() end, mode = { "n", "v" }, desc = "Search & replace (project)" },
+    },
+    opts = {},
+  },
 })
