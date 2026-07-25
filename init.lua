@@ -39,8 +39,6 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
-vim.opt.fixendofline = false
-vim.opt.endofline = false
 vim.opt.updatetime = 300 -- Faster CursorHold for diagnostic floats
 
 -- Diagnostics
@@ -75,24 +73,10 @@ local opts = { noremap = true, silent = true }
 
 -- Fast saving
 keymap("n", "<leader>s", ":w<CR>", opts)
-keymap("n", "<CR>", ":w<CR>", opts)
+-- Single-key save, e.g. to poke filewatchers / dev servers
+keymap("n", "<C-Space>", ":w<CR>", opts)
 
--- Don't hijack <CR> in special buffers (quickfix, Telescope results, help, etc.)
-vim.api.nvim_create_autocmd("BufWinEnter", {
-  callback = function(ev)
-    if vim.bo[ev.buf].buftype == "" then
-      return
-    end
-    -- If the buffer (or its plugin) already binds <CR> itself — aerial,
-    -- diffview panels, etc. — leave it alone instead of clobbering it.
-    if vim.fn.maparg("<CR>", "n", false, true).buffer == 1 then
-      return
-    end
-    vim.keymap.set("n", "<CR>", "<CR>", { buffer = ev.buf, remap = true })
-  end,
-})
-
--- Save without formatting
+-- Save without running formatters (:noa skips conform's BufWritePre hook)
 keymap("n", "<leader>S", ":noa w<CR>", opts)
 
 -- Buffer management
@@ -158,8 +142,21 @@ require("lazy").setup({
   -- 3. TELESCOPE (File Finding)
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "make",
+        cond = function()
+          return vim.fn.executable("make") == 1
+        end,
+      },
+    },
     config = function()
+      local telescope = require('telescope')
+      telescope.setup({})
+      pcall(telescope.load_extension, 'fzf')
+
       local builtin = require('telescope.builtin')
       vim.keymap.set('n', '<leader>f', builtin.live_grep, { desc = "Live Grep" })
       vim.keymap.set('n', '<leader>t', builtin.find_files, { desc = "Find Files" })
@@ -183,8 +180,10 @@ require("lazy").setup({
       -- 2. Turn on native Neovim highlighting and indents globally
       vim.api.nvim_create_autocmd("FileType", {
         callback = function()
-          pcall(vim.treesitter.start)
-          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          -- Only wire up TS indenting for filetypes that actually have a parser.
+          if pcall(vim.treesitter.start) then
+            vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
         end,
       })
     end
@@ -250,7 +249,6 @@ require("lazy").setup({
       "hrsh7th/cmp-nvim-lsp-signature-help",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      "hrsh7th/cmp-cmdline",
       "hrsh7th/nvim-cmp",
       "L3MON4D3/LuaSnip",
     },
@@ -368,15 +366,6 @@ require("lazy").setup({
     "windwp/nvim-ts-autotag",
     ft = { "html", "javascript", "typescript", "javascriptreact", "typescriptreact" },
     opts = {},
-  },
-
-  -- 13. TELESCOPE FZF NATIVE (Performance Boost)
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build = "make",
-    cond = function()
-      return vim.fn.executable("make") == 1
-    end,
   },
 
   -- 14b. DIFFVIEW (Merge Conflict Resolution & Diffs)
