@@ -334,12 +334,6 @@ require("lazy").setup({
     "saghen/blink.cmp",
     version = "1.*", -- release tag ships a prebuilt fuzzy binary (no cargo needed)
     opts = {
-      -- Don't complete in prose buffers (no filetype, markdown, org, text),
-      -- so <CR> stays a plain newline there instead of confirming a stray match.
-      enabled = function()
-        local prose = { [""] = true, markdown = true, org = true, text = true }
-        return not prose[vim.bo.filetype]
-      end,
       -- Mirror the old nvim-cmp bindings: Tab/S-Tab cycle, <CR> confirms.
       keymap = {
         preset = "none",
@@ -356,6 +350,11 @@ require("lazy").setup({
       },
       completion = {
         documentation = { auto_show = true },
+        -- Match the old nvim-cmp feel: nothing preselected (so Tab lands on the
+        -- first item, not the second) and no text inserted while you navigate.
+        -- <CR> then only confirms an item you actually Tabbed onto — otherwise
+        -- it's a plain newline, in every buffer.
+        list = { selection = { preselect = false, auto_insert = false } },
       },
       signature = { enabled = true },
       -- No command-line completion (matches the previous setup).
