@@ -35,11 +35,13 @@ vim.opt.expandtab = true
 vim.opt.splitright = true -- 'set spr'
 vim.opt.swapfile = false
 vim.opt.hidden = true     -- Buffer switching without saving
+vim.opt.undofile = true   -- Persistent undo across sessions
+vim.opt.signcolumn = "yes" -- Gutter always visible; no sideways jump when signs appear
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
-vim.opt.updatetime = 300 -- Faster CursorHold for diagnostic floats
+vim.opt.updatetime = 300 -- Faster CursorHold (document highlight, etc.)
 
 -- Diagnostics
 vim.diagnostic.config({
@@ -48,11 +50,9 @@ vim.diagnostic.config({
   float = { border = "rounded", source = true },
 })
 
-vim.api.nvim_create_autocmd("CursorHold", {
-  callback = function()
-    vim.diagnostic.open_float(nil, { focus = false, scope = "cursor" })
-  end,
-})
+-- Diagnostics show as passive virtual text; open the full float on demand
+-- with <leader>e rather than auto-popping it on every CursorHold (which
+-- covered the code you were trying to read).
 
 -- Restore cursor position
 vim.api.nvim_create_autocmd("BufReadPost", {
@@ -94,6 +94,14 @@ keymap("c", "<C-K>", "<C-U>", { noremap = true }) -- Clear line
 
 -- Disable F1
 keymap("n", "<F1>", ":echo<CR>", opts)
+
+-- Toggle diagnostics on/off (silences the pyright float/virtual-text nags
+-- while reading code). Watch for the red "DIAG OFF" flag in the statusline.
+keymap("n", "<leader>td", function()
+  local on = vim.diagnostic.is_enabled()
+  vim.diagnostic.enable(not on)
+  vim.notify("Diagnostics " .. (on and "OFF" or "ON"))
+end, opts)
 
 -- ========================================================================== --
 -- ==                             PLUGINS                                  == --
@@ -204,7 +212,19 @@ require("lazy").setup({
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = { theme = "solarized_dark" }
+    opts = {
+      options = { theme = "solarized_dark" },
+      sections = {
+        lualine_x = {
+          {
+            function() return "⊘ DIAG OFF" end,
+            cond = function() return not vim.diagnostic.is_enabled() end,
+            color = { fg = "#fdf6e3", bg = "#dc322f", gui = "bold" },
+          },
+          "encoding", "fileformat", "filetype",
+        },
+      },
+    },
   },
 
   -- 7. AUTO-PAIRS
@@ -268,6 +288,13 @@ require("lazy").setup({
           end
         end,
         settings = {
+          basedpyright = {
+            analysis = {
+              -- basedpyright defaults to "recommended", which warns on every
+              -- unannotated parameter. "standard" = actual type errors only.
+              typeCheckingMode = "standard",
+            },
+          },
           python = {
             analysis = {
               autoImportCompletions = true,
@@ -347,14 +374,20 @@ require("lazy").setup({
       },
       sources = {
         default = { "lsp", "path", "snippets", "buffer" },
+        providers = {
+          -- Don't block the menu on pyright (slow with autoImportCompletions);
+          -- show buffer/path/snippet matches immediately, stream LSP items in.
+          lsp = { async = true },
+        },
       },
       completion = {
         documentation = { auto_show = true },
-        -- Match the old nvim-cmp feel: nothing preselected (so Tab lands on the
-        -- first item, not the second) and no text inserted while you navigate.
-        -- <CR> then only confirms an item you actually Tabbed onto — otherwise
-        -- it's a plain newline, in every buffer.
-        list = { selection = { preselect = false, auto_insert = false } },
+        -- preselect=false keeps <CR> safe in prose: it only confirms an item
+        -- you actually Tabbed onto, otherwise it's a plain newline.
+        -- auto_insert=true means Tab inserts the item as you cycle, so you can
+        -- just keep typing — no <CR> needed to commit plain-text matches.
+        -- (<CR>/accept still applies auto-imports and expands snippets.)
+        list = { selection = { preselect = false, auto_insert = true } },
       },
       signature = { enabled = true },
       -- No command-line completion (matches the previous setup).
@@ -524,6 +557,19 @@ require("lazy").setup({
     config = function()
       require("harpoon"):setup()
     end,
+  },
+
+  -- 19b. INLAY HINT FILLER — turn the ghost "x=" hints into real kwargs
+  {
+    "Davidyz/inlayhint-filler.nvim",
+    keys = {
+      {
+        "<leader>I",
+        function() require("inlayhint-filler").fill() end,
+        mode = { "n", "v" },
+        desc = "Insert inlay hint(s) into buffer (kwargs-ify call)",
+      },
+    },
   },
 
   -- 20. BREADCRUMBS (dropbar) — path + code context in the winbar
