@@ -523,6 +523,25 @@ require("lazy").setup({
         console = "integratedTerminal",
       })
 
+      -- Docker: attach to debugpy listening inside the container, e.g.
+      --   python -m debugpy --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0
+      -- pathMappings is required or breakpoints set on host paths never bind.
+      table.insert(dap.configurations.python, {
+        type = "python",
+        request = "attach",
+        name = "Attach (docker)",
+        connect = { host = "127.0.0.1", port = 5678 },
+        pathMappings = function()
+          return {
+            {
+              localRoot = vim.fn.getcwd(),
+              remoteRoot = vim.fn.input("Container workdir: ", "/app"),
+            },
+          }
+        end,
+        justMyCode = false,
+      })
+
       -- Auto-open/close the UI with the session.
       dap.listeners.before.attach.dapui_config = function() dapui.open() end
       dap.listeners.before.launch.dapui_config = function() dapui.open() end
